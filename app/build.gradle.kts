@@ -6,6 +6,9 @@ plugins {
 }
 
 android {
+    buildFeatures{
+        viewBinding = true
+    }
     namespace = "com.example.bookingappteam"
     compileSdk = 36
 
