@@ -18,23 +18,24 @@ class DashboardActivity : AppCompatActivity() {
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.cardAvailableRooms.setOnClickListener {
-            val intent = Intent(this, AvailableRoomsActivity::class.java)
-            startActivity(intent)
-        }
-
-        binding.cardMyBookings.setOnClickListener {
-            val intent = Intent(this, MyBookingsActivity::class.java)
-            startActivity(intent)
-        }
-
-        binding.cardSearchRooms.setOnClickListener {
-            val intent = Intent(this, SearchRoomsActivity::class.java)
-            startActivity(intent)
-        }
-
-        binding.cardBookRoom.setOnClickListener { }
-        val intent = Intent(this, BookRoomActivity::class.java)
-        startActivity(intent)
+//        binding.cardAvailableRooms.setOnClickListener {
+//            val intent = Intent(this, AvailableRoomsActivity::class.java)
+//            startActivity(intent)
+//        }
+//
+//        binding.cardMyBookings.setOnClickListener {
+//            val intent = Intent(this, MyBookingsActivity::class.java)
+//            startActivity(intent)
+//        }
+//
+//        binding.cardSearchRooms.setOnClickListener {
+//            val intent = Intent(this, SearchRoomsActivity::class.java)
+//            startActivity(intent)
+//        }
+//
+//        binding.cardBookRoom.setOnClickListener {
+//            val intent = Intent(this, BookRoomActivity::class.java)
+//            startActivity(intent)
+//        }
     }
 }

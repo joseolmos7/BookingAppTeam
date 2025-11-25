@@ -2,24 +2,63 @@ package com.example.bookingappteam
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-
+import android.widget.Toast
 import com.google.firebase.firestore.FirebaseFirestore
-
-
+import com.google.firebase.database.*
 import android.content.Intent
 import com.example.bookingappteam.databinding.ActivityMainBinding
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var database: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        database = FirebaseDatabase.getInstance().getReference("users")
+
         binding.btnLogin.setOnClickListener {
-            val intent = Intent(this, DashboardActivity::class.java)
-            startActivity(intent)
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
+
+            if(email.isNotEmpty() && password.isNotEmpty()){
+                validateLogin(email, password)
+            } else{
+                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun validateLogin(inputEmail: String, inputPassword: String){
+        database.get().addOnSuccessListener { snapshot ->
+            var loginSuceess = false
+            for (user in snapshot.children){
+                val email = user.child("username").value as? String
+                val password = user.child("password").value as? String
+
+                if(email == inputEmail && password == inputPassword){
+                    loginSuceess = true
+                    break
+                }
+
+            }
+
+            if(loginSuceess){
+                Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, DashboardActivity::class.java)
+                startActivity(intent)
+                finish()
+            } else{
+                Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
+            }
+        }.addOnFailureListener{
+            Toast.makeText(this, "Database error: ${it.message}", Toast.LENGTH_SHORT).show()
         }
     }
 }
