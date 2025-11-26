@@ -18,23 +18,50 @@ class DashboardActivity : AppCompatActivity() {
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.cardAvailableRooms.setOnClickListener {
-            val intent = Intent(this, AvailableRoomsActivity::class.java)
-            startActivity(intent)
+        /* Is this the first time the app is launching? if yes show the fragment
+        if not let the os handle it*/
+
+        if (savedInstanceState == null){
+            val fragment = SearchFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(binding.fragmentContainerView2.id,fragment)
+                .commit()
         }
 
-        binding.cardMyBookings.setOnClickListener {
-            val intent = Intent(this, MyBookingsActivity::class.java)
-            startActivity(intent)
+        // Go to search rooms
+        binding.btnSearch.setOnClickListener {
+            val fragment = SearchFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(binding.fragmentContainerView2.id,fragment)
+                .commit()
         }
 
-        binding.cardSearchRooms.setOnClickListener {
-            val intent = Intent(this, SearchRoomsActivity::class.java)
-            startActivity(intent)
+        // Go to History
+        binding.btnHistory.setOnClickListener {
+            val fragment = HistoryFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(binding.fragmentContainerView2.id,fragment)
+                .commit()
         }
 
-        binding.cardBookRoom.setOnClickListener { }
-        val intent = Intent(this, BookRoomActivity::class.java)
-        startActivity(intent)
+        // Go to Help
+        binding.btnHelp.setOnClickListener {
+            val fragment = HelpFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(binding.fragmentContainerView2.id,fragment)
+                .commit()
+        }
+
+        // Go to Profile
+        binding.btnProfile.setOnClickListener {
+            val fragment = ProfileFragment()
+            supportFragmentManager.beginTransaction()
+                .replace(binding.fragmentContainerView2.id,fragment)
+                .commit()
+        }
+
+
+
+
     }
 }

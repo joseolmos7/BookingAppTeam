@@ -12,6 +12,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookingAppTeam">
         <activity
+            android:name=".EquiptmentViews"
+            android:exported="false" />
+        <activity
+            android:name=".PurposeView"
+            android:exported="false" />
+        <activity
+            android:name=".RoomCap"
+            android:exported="false" />
+        <activity
+            android:name=".MyBookingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AvailableRoomsActivity"
+            android:exported="false" />
+        <activity
             android:name=".DashboardActivity"
             android:exported="false" />
         <activity
