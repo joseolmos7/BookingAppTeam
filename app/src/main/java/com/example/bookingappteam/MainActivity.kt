@@ -3,8 +3,6 @@ package com.example.bookingappteam
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.database.*
 import android.content.Intent
 import com.example.bookingappteam.databinding.ActivityMainBinding
 import com.google.firebase.database.DatabaseReference
@@ -21,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        database = FirebaseDatabase.getInstance().getReference("users")
+        database = FirebaseDatabase.getInstance().reference
 
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
@@ -36,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validateLogin(inputEmail: String, inputPassword: String){
-        database.get().addOnSuccessListener { snapshot ->
+        database.child("users").get().addOnSuccessListener { snapshot ->
             var loginSuceess = false
             for (user in snapshot.children){
                 val email = user.child("username").value as? String

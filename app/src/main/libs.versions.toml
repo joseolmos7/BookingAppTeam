@@ -1,0 +1,10 @@
+toml
+[versions]
+agp = "8.13.1"
+kotlin = "2.0.21"
+coreKtx = "1.17.0"
+# ... other versions    constraintlayout = "2.2.1"
+firebaseBom = "33.1.0" # ADD THIS LINE
+googleGmsServices = "4.4.2" # ADD THIS LINE
+# The "firebaseDatabaseKtx" version line is no longer needed and can be removed.
+    

@@ -1,13 +1,8 @@
 package com.example.bookingappteam
 
-import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-
-
 import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.bookingappteam.databinding.ActivityDashboardBinding
 
 class DashboardActivity : AppCompatActivity() {
@@ -18,11 +13,11 @@ class DashboardActivity : AppCompatActivity() {
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-//        binding.cardAvailableRooms.setOnClickListener {
-//            val intent = Intent(this, AvailableRoomsActivity::class.java)
-//            startActivity(intent)
-//        }
-//
+        binding.cardAvailableRooms.setOnClickListener {
+            val intent = Intent(this, AvailableRoomsActivity::class.java)
+            startActivity(intent)
+        }
+
 //        binding.cardMyBookings.setOnClickListener {
 //            val intent = Intent(this, MyBookingsActivity::class.java)
 //            startActivity(intent)
