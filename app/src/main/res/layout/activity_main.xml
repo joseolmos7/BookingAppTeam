@@ -6,8 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="@android:color/white"
+    android:background="@drawable/background_image"
     tools:context=".MainActivity">
 
     <!-- Welcome Text -->
@@ -15,13 +14,16 @@
         android:id="@+id/tvInvitation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:background="#A0000000"
+        android:padding="8dp"
         android:text="Login to book a study room"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColor="@color/lightGray"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="80dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- CardView Container -->
     <androidx.cardview.widget.CardView
@@ -30,6 +32,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:layout_marginBottom="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         app:cardBackgroundColor="#C8102E"
@@ -89,6 +93,21 @@
                 android:elevation="4dp"
                 android:layout_marginTop="24dp"
                 android:padding="12dp" />
+
+            <!-- Login as Admin Button -->
+            <Button
+                android:id="@+id/btnLoginAdmin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Login as Admin"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:backgroundTint="@android:color/white"
+                android:elevation="4dp"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="32dp"
+                android:paddingVertical="8dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

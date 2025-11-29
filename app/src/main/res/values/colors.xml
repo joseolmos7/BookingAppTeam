@@ -2,11 +2,16 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="lightGray">#D3D3D3</color>
     <color name="topColor">#3F51B5</color> <!-- Indigo -->
     <color name="bottomColor">#303F9F</color> <!-- Darker Indigo -->
     <color name="laGuardiaRed">#C8102E</color>
+    <color name="laGuardiaRedDark">#A80000</color>
     <color name="background">#F5F5F5</color> <!-- Light gray for clean background -->
     <color name="cardBackground">#FFFFFF</color>
+    <color name="cardBackgroundReddish">#FFEBEE</color>
     <color name="textPrimary">#212121</color>
     <color name="textSecondary">#757575</color>
+    <color name="buttonRed">#C8102E</color>
+    <color name="selected_booking">#B39DDB</color> <!-- A light purple for selection -->
 </resources>

@@ -31,28 +31,35 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
             }
         }
+
+        binding.btnLoginAdmin.setOnClickListener { // Added this block
+            val intent = Intent(this, AdminDashboardActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun validateLogin(inputEmail: String, inputPassword: String){
-        database.child("users").get().addOnSuccessListener { snapshot ->
-            var loginSuceess = false
-            for (user in snapshot.children){
-                val email = user.child("username").value as? String
-                val password = user.child("password").value as? String
-
-                if(email == inputEmail && password == inputPassword){
-                    loginSuceess = true
-                    break
+        database.child("users").orderByChild("username").equalTo(inputEmail).get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
+                var loginSuccess = false
+                for (userSnapshot in snapshot.children) {
+                    val password = userSnapshot.child("password").value as? String
+                    if (password == inputPassword) {
+                        loginSuccess = true
+                        break
+                    }
                 }
 
-            }
-
-            if(loginSuceess){
-                Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, DashboardActivity::class.java)
-                startActivity(intent)
-                finish()
-            } else{
+                if (loginSuccess) {
+                    Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, DashboardActivity::class.java)
+                    intent.putExtra("USERNAME", inputEmail)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
+                }
+            } else {
                 Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show()
             }
         }.addOnFailureListener{

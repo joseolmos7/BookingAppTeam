@@ -34,9 +34,9 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Card: Available Rooms -->
+            <!-- Card: Search Rooms -->
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAvailableRooms"
+                android:id="@+id/cardSearchRooms"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -49,10 +49,11 @@
                     android:orientation="horizontal"
                     android:padding="16dp">
 
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Available Rooms"
+                        android:text="Search and Book Available Rooms"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:layout_marginStart="16dp"/>
@@ -78,32 +79,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="My Bookings"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:layout_marginStart="16dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Card: Search Rooms -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardSearchRooms"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="12dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Search Rooms"
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:layout_marginStart="16dp"/>
@@ -159,23 +134,6 @@
                         android:textStyle="bold"
                         android:layout_marginStart="16dp"/>
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardBookRoom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="12dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Book a Room"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:padding="16dp"/>
             </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
