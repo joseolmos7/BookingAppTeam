@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import com.example.bookingappteam.databinding.FragmentSearchBinding
 
 class SearchFragment : Fragment() {
@@ -39,6 +40,8 @@ class SearchFragment : Fragment() {
             val intent = Intent(requireContext(), EquiptmentViews::class.java)
             startActivity(intent)
         }
+
+
         return binding.root
     // end of on create
     }

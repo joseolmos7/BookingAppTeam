@@ -8,6 +8,7 @@ import androidx.core.view.WindowInsetsCompat
 
 
 import android.content.Intent
+import androidx.lifecycle.ViewModelProvider
 import com.example.bookingappteam.databinding.ActivityDashboardBinding
 
 class DashboardActivity : AppCompatActivity() {
@@ -59,6 +60,7 @@ class DashboardActivity : AppCompatActivity() {
                 .replace(binding.fragmentContainerView2.id,fragment)
                 .commit()
         }
+
 
 
 

@@ -32,6 +32,7 @@
             app:layout_constraintVertical_bias="0.508">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardOneTwo"
                 android:layout_width="match_parent"
                 android:layout_height="126dp">
 
@@ -53,6 +54,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardTwoFour"
                 android:layout_width="match_parent"
                 android:layout_height="126dp">
 
@@ -73,6 +75,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardFourSix"
                 android:layout_width="match_parent"
                 android:layout_height="126dp">
 
@@ -93,6 +96,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardSixEight"
                 android:layout_width="match_parent"
                 android:layout_height="126dp">
 
@@ -113,6 +117,7 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cardNine"
                 android:layout_width="match_parent"
                 android:layout_height="126dp">
 
@@ -134,17 +139,19 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="67dp"
-        android:layout_height="48dp"
+    <ImageButton
+        android:id="@+id/btnRoomBack"
+        android:layout_width="63dp"
+        android:layout_height="50dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="328dp"
-        android:layout_marginBottom="5dp"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        android:layout_marginEnd="332dp"
+        android:layout_marginBottom="665dp"
+        android:contentDescription="Back"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_arrow_back" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
