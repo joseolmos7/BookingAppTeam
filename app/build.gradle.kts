@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services") //  Required for Firebase
+
 }
 
 android {
@@ -41,23 +42,15 @@ android {
 
 
 dependencies {
-    // Firebase BOM controls versions
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
-
-    // Firebase libraries (no version numbers needed!)
-    implementation("com.google.firebase:firebase-database-ktx:21.0.0")
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-firestore")
-
-    // AndroidX + Material
+    implementation("com.google.firebase:firebase-analytics") // or Firestore/Auth/etc.
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-
-    // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("com.google.firebase:firebase-firestore")
 }
