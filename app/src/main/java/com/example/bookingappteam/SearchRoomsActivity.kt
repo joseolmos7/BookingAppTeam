@@ -119,7 +119,9 @@ class SearchRoomsActivity : AppCompatActivity() {
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, displayHours)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerTime.adapter = adapter
+
+        binding.spinnerStartTime.adapter = adapter
+        binding.spinnerEndTime.adapter = adapter
     }
 
     private fun setupButtons() {
@@ -131,11 +133,25 @@ class SearchRoomsActivity : AppCompatActivity() {
         clearResults()
 
         val date = binding.btnSelectDate.text.toString()
-        if (timeValuesForSpinner.isEmpty() || binding.spinnerTime.selectedItemPosition < 0) {
+
+        if (timeValuesForSpinner.isEmpty()
+            || binding.spinnerStartTime.selectedItemPosition < 0
+            || binding.spinnerEndTime.selectedItemPosition < 0
+        ) {
             Toast.makeText(this, "No available time slots for this day.", Toast.LENGTH_SHORT).show()
             return
         }
-        val time = timeValuesForSpinner[binding.spinnerTime.selectedItemPosition]
+
+        val startIndex = binding.spinnerStartTime.selectedItemPosition
+        val endIndex = binding.spinnerEndTime.selectedItemPosition
+
+        if (endIndex <= startIndex) {
+            Toast.makeText(this, "End time must be after start time.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // TEMP for now (until later steps): keep using start time
+        val time = timeValuesForSpinner[startIndex]
 
         val scheduleRef = database.child("schedule").child(date).child(time)
         val roomsRef = database.child("rooms")
@@ -171,6 +187,26 @@ class SearchRoomsActivity : AppCompatActivity() {
     }
 
     private fun reserveRoom() {
+
+        val startIndex = binding.spinnerStartTime.selectedItemPosition
+        val endIndex = binding.spinnerEndTime.selectedItemPosition
+
+        if (timeValuesForSpinner.isEmpty()
+            || startIndex < 0
+            || endIndex < 0
+        ) {
+            Toast.makeText(this, "Cannot reserve, selected time is not valid.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (endIndex <= startIndex) {
+            Toast.makeText(this, "End time must be after start time.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // TEMP: still using start time for now
+        val time = timeValuesForSpinner[startIndex]
+
         val selectedRadioButtonId = binding.radioGroupRooms.checkedRadioButtonId
         if (selectedRadioButtonId == -1) {
             Toast.makeText(this, "Please select a room to reserve.", Toast.LENGTH_SHORT).show()
@@ -186,11 +222,10 @@ class SearchRoomsActivity : AppCompatActivity() {
         val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
         val roomKey = selectedRadioButton.tag as String
         val date = binding.btnSelectDate.text.toString()
-        if (timeValuesForSpinner.isEmpty() || binding.spinnerTime.selectedItemPosition < 0) {
+        if (timeValuesForSpinner.isEmpty() || startIndex < 0 || endIndex < 0) {
             Toast.makeText(this, "Cannot reserve, selected time is not valid.", Toast.LENGTH_SHORT).show()
             return
         }
-        val time = timeValuesForSpinner[binding.spinnerTime.selectedItemPosition]
         val numberOfStudents = binding.studentsSpinner.selectedItem.toString()
 
         val bookingDetails = hashMapOf(

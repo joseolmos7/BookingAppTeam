@@ -118,17 +118,23 @@
             <Button
                 android:id="@+id/btnSelectDate"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Select Date"
+                android:layout_weight="1"
                 android:backgroundTint="@color/laGuardiaRed"
-                android:textColor="@color/black"/>
+                android:text="Select Date"
+                android:textColor="@color/black" />
 
             <Spinner
-                android:id="@+id/spinnerTime"
+                android:id="@+id/spinnerStartTime"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Spinner
+                android:id="@+id/spinnerEndTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
         </LinearLayout>
 
