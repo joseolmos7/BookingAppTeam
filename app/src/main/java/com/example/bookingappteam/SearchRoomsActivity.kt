@@ -150,24 +150,40 @@ class SearchRoomsActivity : AppCompatActivity() {
             return
         }
 
-        // TEMP for now (until later steps): keep using start time
-        val time = timeValuesForSpinner[startIndex]
+        // number of students from spinner
+        val numberOfStudents = binding.studentsSpinner.selectedItem.toString().toInt()
 
-        val scheduleRef = database.child("schedule").child(date).child(time)
         val roomsRef = database.child("rooms")
+        val dayScheduleRef = database.child("schedule").child(date)
 
         roomsRef.get().addOnSuccessListener { allRoomsSnapshot ->
-            val allRooms = allRoomsSnapshot.children.mapNotNull { it.key }.toSet()
+            val eligibleRooms = mutableSetOf<String>()
 
-            scheduleRef.get().addOnSuccessListener { bookedRoomsSnapshot ->
-                val bookedRooms = bookedRoomsSnapshot.children.mapNotNull { it.key }.toSet()
-                val availableRooms = allRooms - bookedRooms
+            for (roomSnap in allRoomsSnapshot.children) {
+                val roomKey = roomSnap.key ?: continue
+
+                // if capacity doesn't exist, assume very large (room is OK)
+                val capacityLong = roomSnap.child("capacity").getValue(Long::class.java)
+                val capacity = capacityLong?.toInt() ?: Int.MAX_VALUE
+
+                if (capacity >= numberOfStudents) {
+                    eligibleRooms.add(roomKey)
+                }
+            }
+
+            dayScheduleRef.get().addOnSuccessListener { daySnapshot ->
+                // rooms that have ANY booking on this date
+                val bookedRooms = daySnapshot.children.mapNotNull { it.key }.toSet()
+
+                val availableRooms = eligibleRooms - bookedRooms
 
                 if (availableRooms.isEmpty()) {
                     binding.tvNoRooms.visibility = View.VISIBLE
                 } else {
                     displayAvailableRooms(availableRooms)
                 }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Failed to load bookings for this date.", Toast.LENGTH_SHORT).show()
             }
         }.addOnFailureListener {
             Toast.makeText(this, "Failed to load rooms list.", Toast.LENGTH_SHORT).show()
@@ -204,8 +220,10 @@ class SearchRoomsActivity : AppCompatActivity() {
             return
         }
 
-        // TEMP: still using start time for now
-        val time = timeValuesForSpinner[startIndex]
+        // ✅ NEW: use start + end
+        val startTime = timeValuesForSpinner[startIndex]   // e.g. "0800"
+        val endTime = timeValuesForSpinner[endIndex]       // e.g. "1000"
+        val timeRangeKey = "$startTime-$endTime"          // "0800-1000"
 
         val selectedRadioButtonId = binding.radioGroupRooms.checkedRadioButtonId
         if (selectedRadioButtonId == -1) {
@@ -222,24 +240,28 @@ class SearchRoomsActivity : AppCompatActivity() {
         val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
         val roomKey = selectedRadioButton.tag as String
         val date = binding.btnSelectDate.text.toString()
-        if (timeValuesForSpinner.isEmpty() || startIndex < 0 || endIndex < 0) {
-            Toast.makeText(this, "Cannot reserve, selected time is not valid.", Toast.LENGTH_SHORT).show()
-            return
-        }
         val numberOfStudents = binding.studentsSpinner.selectedItem.toString()
 
         val bookingDetails = hashMapOf(
             "username" to username,
             "purpose" to purpose,
-            "numberOfStudents" to numberOfStudents
+            "numberOfStudents" to numberOfStudents,
+            // optional but useful:
+            "startTime" to startTime,
+            "endTime" to endTime
         )
 
-        database.child("schedule").child(date).child(time).child(roomKey).setValue(bookingDetails)
+        // ✅ NEW STRUCTURE: schedule/date/room/start-end
+        database.child("schedule")
+            .child(date)
+            .child(roomKey)
+            .child(timeRangeKey)
+            .setValue(bookingDetails)
             .addOnSuccessListener {
                 Toast.makeText(this, "Booking Confirmed!", Toast.LENGTH_LONG).show()
                 val intent = Intent(this, DashboardActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("USERNAME", username) // Pass username back
+                intent.putExtra("USERNAME", username)
                 startActivity(intent)
                 finish()
             }
@@ -253,4 +275,6 @@ class SearchRoomsActivity : AppCompatActivity() {
         binding.btnReserve.visibility = View.GONE
         binding.tvNoRooms.visibility = View.GONE
     }
+
+
 }
