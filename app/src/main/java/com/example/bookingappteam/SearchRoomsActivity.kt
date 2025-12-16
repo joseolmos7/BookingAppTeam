@@ -16,10 +16,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.HashMap
 import java.util.Locale
 
 class SearchRoomsActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivitySearchRoomsBinding
     private lateinit var database: DatabaseReference
     private var username: String? = null
@@ -126,7 +126,7 @@ class SearchRoomsActivity : AppCompatActivity() {
 
     private fun setupButtons() {
         binding.btnSearch.setOnClickListener { searchAvailableRooms() }
-        binding.btnReserve.setOnClickListener { reserveRoom() }
+        binding.btnReserve.setOnClickListener {reserveRoom() }
     }
 
     private fun searchAvailableRooms() {
@@ -134,23 +134,21 @@ class SearchRoomsActivity : AppCompatActivity() {
 
         val date = binding.btnSelectDate.text.toString()
 
-        if (timeValuesForSpinner.isEmpty()
-            || binding.spinnerStartTime.selectedItemPosition < 0
-            || binding.spinnerEndTime.selectedItemPosition < 0
-        ) {
+        val startIndex = binding.spinnerStartTime.selectedItemPosition
+        val endIndex = binding.spinnerEndTime.selectedItemPosition
+
+        if (timeValuesForSpinner.isEmpty() || startIndex < 0 || endIndex < 0) {
             Toast.makeText(this, "No available time slots for this day.", Toast.LENGTH_SHORT).show()
             return
         }
-
-        val startIndex = binding.spinnerStartTime.selectedItemPosition
-        val endIndex = binding.spinnerEndTime.selectedItemPosition
 
         if (endIndex <= startIndex) {
             Toast.makeText(this, "End time must be after start time.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // number of students from spinner
+        val requestedStart = timeValuesForSpinner[startIndex].toInt()
+        val requestedEnd = timeValuesForSpinner[endIndex].toInt()
         val numberOfStudents = binding.studentsSpinner.selectedItem.toString().toInt()
 
         val roomsRef = database.child("rooms")
@@ -161,8 +159,6 @@ class SearchRoomsActivity : AppCompatActivity() {
 
             for (roomSnap in allRoomsSnapshot.children) {
                 val roomKey = roomSnap.key ?: continue
-
-                // if capacity doesn't exist, assume very large (room is OK)
                 val capacityLong = roomSnap.child("capacity").getValue(Long::class.java)
                 val capacity = capacityLong?.toInt() ?: Int.MAX_VALUE
 
@@ -172,10 +168,27 @@ class SearchRoomsActivity : AppCompatActivity() {
             }
 
             dayScheduleRef.get().addOnSuccessListener { daySnapshot ->
-                // rooms that have ANY booking on this date
-                val bookedRooms = daySnapshot.children.mapNotNull { it.key }.toSet()
+                val availableRooms = mutableSetOf<String>()
 
-                val availableRooms = eligibleRooms - bookedRooms
+                for (roomKey in eligibleRooms) {
+                    val roomSnapshot = daySnapshot.child(roomKey)
+                    var conflict = false
+
+                    for (timeSnapshot in roomSnapshot.children) {
+                        val bookingDetails = timeSnapshot.value as? HashMap<*, *> ?: continue
+                        val existingStart = (bookingDetails["startTime"] as? String)?.toIntOrNull() ?: continue
+                        val existingEnd = (bookingDetails["endTime"] as? String)?.toIntOrNull() ?: continue
+
+                        if (isOverlapping(requestedStart, requestedEnd, existingStart, existingEnd)) {
+                            conflict = true
+                            break
+                        }
+                    }
+
+                    if (!conflict) {
+                        availableRooms.add(roomKey)
+                    }
+                }
 
                 if (availableRooms.isEmpty()) {
                     binding.tvNoRooms.visibility = View.VISIBLE
@@ -189,7 +202,6 @@ class SearchRoomsActivity : AppCompatActivity() {
             Toast.makeText(this, "Failed to load rooms list.", Toast.LENGTH_SHORT).show()
         }
     }
-
     private fun displayAvailableRooms(availableRooms: Set<String>) {
         for (roomKey in availableRooms) {
             database.child("rooms").child(roomKey).child("name").get().addOnSuccessListener {
@@ -207,6 +219,7 @@ class SearchRoomsActivity : AppCompatActivity() {
         val startIndex = binding.spinnerStartTime.selectedItemPosition
         val endIndex = binding.spinnerEndTime.selectedItemPosition
 
+
         if (timeValuesForSpinner.isEmpty()
             || startIndex < 0
             || endIndex < 0
@@ -220,7 +233,7 @@ class SearchRoomsActivity : AppCompatActivity() {
             return
         }
 
-        // ✅ NEW: use start + end
+        // NEW: use start + end
         val startTime = timeValuesForSpinner[startIndex]   // e.g. "0800"
         val endTime = timeValuesForSpinner[endIndex]       // e.g. "1000"
         val timeRangeKey = "$startTime-$endTime"          // "0800-1000"
@@ -242,39 +255,58 @@ class SearchRoomsActivity : AppCompatActivity() {
         val date = binding.btnSelectDate.text.toString()
         val numberOfStudents = binding.studentsSpinner.selectedItem.toString()
 
-        val bookingDetails = hashMapOf(
-            "username" to username,
-            "purpose" to purpose,
-            "numberOfStudents" to numberOfStudents,
-            // optional but useful:
-            "startTime" to startTime,
-            "endTime" to endTime
-        )
 
-        // ✅ NEW STRUCTURE: schedule/date/room/start-end
-        database.child("schedule")
-            .child(date)
-            .child(roomKey)
-            .child(timeRangeKey)
-            .setValue(bookingDetails)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Booking Confirmed!", Toast.LENGTH_LONG).show()
-                val intent = Intent(this, DashboardActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("USERNAME", username)
-                startActivity(intent)
-                finish()
+        val newStart = startTime.toInt()
+        val newEnd = endTime.toInt()
+
+        val roomSchedulleRef = database.child("schedule").child(date).child(roomKey)
+        roomSchedulleRef.get().addOnSuccessListener { roomSnapshot->
+            var conflict = false
+            for(timeSnapshot in roomSnapshot.children){
+                val bookingDetails = timeSnapshot.value as? HashMap<*,*> ?: continue
+                val existingStart = (bookingDetails["startTime"] as? String)?.toIntOrNull() ?: continue
+                val existingEnd = (bookingDetails["endTime"] as? String)?.toIntOrNull() ?: continue
+
+                if(isOverlapping(newStart, newEnd, existingStart,existingEnd)){
+                    conflict = true
+                    break
+                }
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Booking failed. Please try again.", Toast.LENGTH_SHORT).show()
+
+            if(conflict){
+                Toast.makeText(this,"Room already booked for that time range.", Toast.LENGTH_LONG).show()
+            } else{
+                val bookingDetails = hashMapOf(
+                    "username" to username,
+                    "purpose" to purpose,
+                    "numberOfStudents" to numberOfStudents,
+                    // optional but useful:
+                    "startTime" to startTime,
+                    "endTime" to endTime
+                )
+
+                roomSchedulleRef.child(timeRangeKey).setValue(bookingDetails)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Booking Confirmed!", Toast.LENGTH_LONG).show()
+                        val intent = Intent(this, DashboardActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.putExtra("USERNAME", username)
+                        startActivity(intent)
+                        finish()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Booking failed. Please try again.", Toast.LENGTH_SHORT).show()
+                    }
             }
+        }
     }
-
     private fun clearResults() {
         binding.radioGroupRooms.removeAllViews()
         binding.btnReserve.visibility = View.GONE
         binding.tvNoRooms.visibility = View.GONE
     }
 
-
+    private fun isOverlapping(start1: Int, end1:Int,start2: Int, end2:Int): Boolean{
+        return start1 < end2 && start2 < end1
+    }
 }

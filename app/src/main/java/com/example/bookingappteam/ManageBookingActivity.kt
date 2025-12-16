@@ -47,38 +47,61 @@ class ManageBookingActivity : AppCompatActivity() {
         scheduleRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 bookings.clear()
-                var bookingsFound = false
+
                 if (snapshot.exists()) {
                     for (dateSnapshot in snapshot.children) {
-                        for (timeSnapshot in dateSnapshot.children) {
-                            for (roomSnapshot in timeSnapshot.children) {
-                                val bookingDetails = roomSnapshot.value as? HashMap<*, *>
-                                if (bookingDetails != null) {
-                                    bookingsFound = true
-                                    val date = dateSnapshot.key!!
-                                    val time = timeSnapshot.key!!
-                                    val roomKey = roomSnapshot.key!!
-                                    val purpose = bookingDetails["purpose"] as? String ?: "N/A"
-                                    val numberOfStudents = bookingDetails["numberOfStudents"] as? String ?: "N/A"
-                                    val username = bookingDetails["username"] as? String ?: "N/A"
+                        val rawDate = dateSnapshot.key ?: continue
 
-                                    database.getReference("rooms").child(roomKey).child("name").get().addOnSuccessListener { roomNameSnapshot ->
+                        for (roomSnapshot in dateSnapshot.children) {
+                            val roomKey = roomSnapshot.key ?: continue
+
+                            for (timeSnapshot in roomSnapshot.children) {
+                                val bookingDetails = timeSnapshot.value as? HashMap<*, *> ?: continue
+                                val rawTime = timeSnapshot.key ?: continue
+
+                                val purpose = bookingDetails["purpose"]?.toString() ?: "N/A"
+                                val numberOfStudents = bookingDetails["numberOfStudents"]?.toString() ?: "N/A"
+                                val username = bookingDetails["username"]?.toString() ?: "N/A"
+
+                                database.getReference("rooms").child(roomKey).child("name").get()
+                                    .addOnSuccessListener { roomNameSnapshot ->
                                         val roomName = roomNameSnapshot.value as? String ?: roomKey
-                                        val displayDate = SimpleDateFormat("MMM dd, yyyy", Locale.US).format(SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(date)!!)
-                                        val displayTime = SimpleDateFormat("hh:mm a", Locale.US).format(SimpleDateFormat("HHmm", Locale.US).parse(time)!!)
-                                        val dbRef = roomSnapshot.ref
-                                        bookings.add(Booking(roomName, displayDate, displayTime, purpose, numberOfStudents, username, dbRef))
+
+                                        val displayDate = try {
+                                            val parsedDate = SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(rawDate)
+                                            SimpleDateFormat("MMM dd, yyyy", Locale.US).format(parsedDate!!)
+                                        } catch (e: Exception) {
+                                            rawDate
+                                        }
+
+                                        val displayTime = try {
+                                            val parts = rawTime.split("-")
+                                            val formatter = SimpleDateFormat("hh:mm a", Locale.US)
+                                            val start = SimpleDateFormat("HHmm", Locale.US).parse(parts[0])
+                                            val end = SimpleDateFormat("HHmm", Locale.US).parse(parts[1])
+                                            "${formatter.format(start!!)} - ${formatter.format(end!!)}"
+                                        } catch (e: Exception) {
+                                            rawTime
+                                        }
+
+                                        val dbRef = timeSnapshot.ref
+                                        bookings.add(
+                                            Booking(roomName, displayDate, displayTime, purpose, numberOfStudents, username, dbRef)
+                                        )
                                         bookingAdapter.notifyDataSetChanged()
+
+                                        // Show/hide cancel button depending on list content
+                                        if (bookings.isNotEmpty()) {
+                                            binding.buttonCancelBooking.visibility = View.VISIBLE
+                                            binding.tvNoReservations.visibility = View.GONE
+                                        } else {
+                                            binding.buttonCancelBooking.visibility = View.GONE
+                                            binding.tvNoReservations.visibility = View.VISIBLE
+                                        }
                                     }
-                                }
                             }
                         }
                     }
-                }
-
-                if (bookingsFound) {
-                    binding.buttonCancelBooking.visibility = View.VISIBLE
-                    binding.tvNoReservations.visibility = View.GONE
                 } else {
                     binding.buttonCancelBooking.visibility = View.GONE
                     binding.tvNoReservations.visibility = View.VISIBLE
@@ -91,7 +114,6 @@ class ManageBookingActivity : AppCompatActivity() {
             }
         })
     }
-
     private fun performCancellation() {
         val selectedBookings = bookingAdapter.getSelectedBookings()
 
